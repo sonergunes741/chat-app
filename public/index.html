@@ -1,25 +1,63 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Uygulaması</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <div class="theme-toggle">
+        <button id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+    
     <div class="container">
         <div class="join-container">
-            <input type="text" id="username" placeholder="Kullanıcı adı">
-            <input type="text" id="roomKey" placeholder="Oda anahtarı">
-            <button onclick="joinRoom()">Odaya Katıl</button>
+            <div class="profile-setup">
+                <div class="avatar-upload">
+                    <div class="avatar-preview">
+                        <div id="avatarPreview"></div>
+                    </div>
+                    <input type="file" id="avatarUpload" accept="image/*">
+                    <label for="avatarUpload" class="upload-btn">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                </div>
+                <input type="text" id="username" placeholder="Kullanıcı adı">
+                <input type="text" id="status" placeholder="Durum mesajı">
+                <input type="text" id="roomKey" placeholder="Oda anahtarı">
+                <button class="primary-btn" onclick="joinRoom()">
+                    <i class="fas fa-sign-in-alt"></i> Odaya Katıl
+                </button>
+            </div>
         </div>
         
         <div class="chat-container" style="display: none;">
-            <div id="messages"></div>
-            <div class="input-container">
-                <input type="text" id="messageInput" placeholder="Mesajınızı yazın...">
-                <button onclick="sendMessage()">Gönder</button>
+            <div class="chat-sidebar">
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-info">
+                        <h3 id="displayUsername"></h3>
+                        <p id="displayStatus"></p>
+                    </div>
+                </div>
+                <div class="room-info">
+                    <h4>Oda: <span id="displayRoom"></span></h4>
+                </div>
+            </div>
+            
+            <div class="chat-main">
+                <div id="messages" class="messages-container"></div>
+                <div class="input-container">
+                    <input type="text" id="messageInput" placeholder="Mesajınızı yazın...">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
