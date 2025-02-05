@@ -232,3 +232,40 @@ input {
         max-width: 85%;
     }
 }
+
+.users-list {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--text-secondary);
+}
+
+.users-list h4 {
+    color: var(--text);
+    margin-bottom: 10px;
+}
+
+.online-users-list {
+    list-style: none;
+}
+
+.online-users-list li {
+    padding: 8px 0;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+}
+
+.online-users-list li::before {
+    content: "•";
+    color: #22c55e;
+    margin-right: 8px;
+}
+
+.system-message {
+    text-align: center;
+    padding: 8px;
+    margin: 8px 0;
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 14px;
+}
