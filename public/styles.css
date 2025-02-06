@@ -68,13 +68,14 @@ body {
 .profile-setup {
     padding: 30px;
     text-align: center;
+    margin-top: 40px;
 }
 
 .avatar-upload {
     position: relative;
     width: 120px;
     height: 120px;
-    margin: 0 auto 20px;
+    margin: 20px auto 40px;
 }
 
 .avatar-preview {
@@ -83,6 +84,7 @@ body {
     border-radius: 50%;
     overflow: hidden;
     background: var(--message-received);
+    transition: all 0.3s ease;
 }
 
 .upload-btn {
@@ -94,6 +96,27 @@ body {
     padding: 8px;
     border-radius: 50%;
     cursor: pointer;
+    /* Gölge ve geçiş efekti ekleyin */
+    box-shadow: 0 2px 4px var(--shadow);
+    transition: all 0.3s ease;
+    /* Boyutu biraz büyütün */
+    width: 35px;
+    height: 35px;
+    /* İkonu ortalayın */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-btn:hover {
+    transform: scale(1.1);
+    background: var(--primary);
+    opacity: 0.9;
+}
+
+/* Avatar preview'a hover efekti ekleyin */
+.avatar-preview:hover {
+    opacity: 0.8;
 }
 
 input {
