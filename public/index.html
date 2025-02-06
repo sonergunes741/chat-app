@@ -29,7 +29,18 @@
                 </div>
                 <input type="text" id="username" placeholder="Kullanıcı adı">
                 <input type="text" id="status" placeholder="Durum mesajı">
-                <input type="text" id="roomKey" placeholder="Oda anahtarı">
+                <div class="key-container">
+                    <input type="text" id="roomKey" placeholder="Oda anahtarı" readonly>
+                    <button class="key-btn" id="generateKeyBtn">
+                        <i class="fas fa-key"></i> Key Oluştur
+                    </button>
+                    <button class="key-btn" id="copyKeyBtn">
+                        <i class="fas fa-copy"></i> Kopyala
+                    </button>
+                    <button class="key-btn" id="pasteKeyBtn">
+                        <i class="fas fa-paste"></i> Yapıştır
+                    </button>
+                </div>
                 <button class="primary-btn" onclick="joinRoom()">
                     <i class="fas fa-sign-in-alt"></i> Odaya Katıl
                 </button>

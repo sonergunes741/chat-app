@@ -269,3 +269,89 @@ input {
     font-style: italic;
     font-size: 14px;
 }
+
+/* Key container stilleri - diğer stillerin yanına ekleyin */
+.key-container {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.key-btn {
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    flex-shrink: 0;
+}
+
+.key-btn:hover {
+    opacity: 0.9;
+}
+
+#roomKey {
+    flex: 1;
+}
+
+/* Başarılı işlem bildirimi için stil */
+.copy-success {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #22c55e;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    animation: fadeInOut 2s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Yapıştırma başarılı bildirimi için stil */
+.paste-success {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #22c55e;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    animation: fadeInOut 2s ease-in-out forwards;
+    z-index: 1000;
+}
+
+/* Yapıştırma hata bildirimi için stil */
+.paste-error {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ef4444;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    animation: fadeInOut 2s ease-in-out forwards;
+    z-index: 1000;
+}
+
+/* Key container içindeki butonların responsive düzeni için */
+@media (max-width: 480px) {
+    .key-container {
+        flex-wrap: wrap;
+    }
+    
+    .key-container .key-btn {
+        flex: 1;
+        min-width: calc(33.333% - 8px);
+    }
+}

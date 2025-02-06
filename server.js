@@ -2,17 +2,48 @@ const express = require('express');
 const { WebSocket, WebSocketServer } = require('ws');
 const path = require('path');
 const url = require('url');
+const crypto = require('crypto');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static('public'));
+app.use(cors());
 
-const server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+// Statik dosyaları serve etmek için public klasörünü belirt
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production') {
+        return res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
 });
 
-const wss = new WebSocketServer({ server });
+// Key oluşturma endpoint'i
+app.get('/generate-key', (req, res) => {
+    console.log('Key oluşturma isteği alındı');
+    const uniqueKey = generateUniqueKey();
+    console.log('Oluşturulan key:', uniqueKey);
+    res.json({ key: uniqueKey });
+});
+
+// const server = app.listen(PORT, () => {
+//     console.log(`Server http://localhost:${PORT} adresinde çalışıyor`);
+// });
+
+// WebSocket sunucusu için güvenli bağlantı yapılandırması
+const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+// ... (diğer WebSocket kodları aynı kalacak)
+
+const wss = new WebSocketServer({ 
+    server,
+    clientTracking: true,
+    perMessageDeflate: false // Performans optimizasyonu
+});
 const rooms = new Map();
 
 wss.on('connection', (ws, req) => {
@@ -100,4 +131,8 @@ function broadcastSystemMessage(roomKey, message) {
             client.send(systemMessage);
         }
     });
+}
+
+function generateUniqueKey() {
+    return crypto.randomBytes(4).toString('hex');
 }

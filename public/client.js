@@ -4,6 +4,49 @@ let username = '';
 let roomKey = '';
 let userAvatar = null;
 
+// client.js başına ekleyin
+const clipboardSupported = navigator.clipboard && typeof navigator.clipboard.readText === 'function';
+if (!clipboardSupported) {
+    const pasteBtn = document.getElementById('pasteKeyBtn');
+    if (pasteBtn) {
+        pasteBtn.style.display = 'none';
+    }
+}
+
+// client.js başına ekleyin
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM yüklendi, event listener\'lar ekleniyor...');
+    
+    // Tema kontrolü
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    // Avatar yükleme
+    const avatarUpload = document.getElementById('avatarUpload');
+    if (avatarUpload) {
+        avatarUpload.addEventListener('change', handleAvatarUpload);
+    }
+    
+    // Key işlemleri
+    const generateKeyBtn = document.getElementById('generateKeyBtn');
+    const copyKeyBtn = document.getElementById('copyKeyBtn');
+    
+    if (generateKeyBtn) {
+        generateKeyBtn.addEventListener('click', () => {
+            console.log('Key oluştur butonuna tıklandı');
+            generateKey();
+        });
+    }
+    
+    if (copyKeyBtn) {
+        copyKeyBtn.addEventListener('click', copyKey);
+    }
+
+    if (document.getElementById('pasteKeyBtn')) {
+        document.getElementById('pasteKeyBtn').addEventListener('click', pasteKey);
+    }
+});
+
 // Tema değiştirme
 function toggleTheme() {
     const html = document.documentElement;
@@ -54,9 +97,9 @@ function joinRoom() {
     // const wsUrl = `ws://localhost:3000?username=${encodeURIComponent(username)}&roomKey=${encodeURIComponent(roomKey)}`;
     
     // Dinamik WebSocket URL'i
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}?username=${encodeURIComponent(username)}&roomKey=${encodeURIComponent(roomKey)}`;
-    
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${wsProtocol}//${window.location.host}?username=${encodeURIComponent(username)}&roomKey=${encodeURIComponent(roomKey)}`;
+
     socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
@@ -147,6 +190,83 @@ function displaySystemMessage(message) {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
+// client.js içindeki generateKey fonksiyonunu güncelleyin
+// client.js içindeki generateKey fonksiyonu
+async function generateKey() {
+    try {
+        const response = await fetch(`${window.location.origin}/generate-key`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        document.getElementById('roomKey').value = data.key;
+    } catch (error) {
+        console.error('Anahtar oluşturma hatası:', error);
+        alert('Anahtar oluşturulurken bir hata oluştu! Hata: ' + error.message);
+    }
+}
+
+function copyKey() {
+    const roomKey = document.getElementById('roomKey');
+    roomKey.select();
+    document.execCommand('copy');
+    
+    // Kopyalama başarılı bildirimi
+    const notification = document.createElement('div');
+    notification.className = 'copy-success';
+    notification.textContent = 'Anahtar kopyalandı!';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 2000);
+}
+
+// Yapıştırma fonksiyonu
+async function pasteKey() {
+    try {
+        const text = await navigator.clipboard.readText();
+        const roomKeyInput = document.getElementById('roomKey');
+        roomKeyInput.value = text;
+        
+        // Başarılı yapıştırma bildirimi
+        const notification = document.createElement('div');
+        notification.className = 'paste-success';
+        notification.textContent = 'Anahtar yapıştırıldı!';
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 2000);
+    } catch (err) {
+        console.error('Yapıştırma hatası:', err);
+        // Kullanıcıya hata bildirimi
+        const notification = document.createElement('div');
+        notification.className = 'paste-error';
+        notification.textContent = 'Yapıştırma izni reddedildi!';
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 2000);
+    }
+}
+
+// client.js'de bağlantı hatası kontrolü ekleyin
+socket.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+    displaySystemMessage('Bağlantı hatası oluştu. Lütfen sayfayı yenileyin.');
+};
+
+socket.onclose = (event) => {
+    console.log('WebSocket Closed:', event.code, event.reason);
+    displaySystemMessage('Bağlantı kesildi. Yeniden bağlanılıyor...');
+    // Otomatik yeniden bağlanma
+    setTimeout(() => {
+        joinRoom();
+    }, 3000);
+};
+
 const styleSheet = document.createElement("style");
 styleSheet.textContent = `
     .user-status-indicator {
@@ -179,3 +299,4 @@ document.getElementById('messageInput').addEventListener('keypress', (e) => {
         sendMessage();
     }
 });
+
