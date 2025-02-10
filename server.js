@@ -5,8 +5,17 @@ const url = require('url');
 const crypto = require('crypto');
 const cors = require('cors');
 
+const mongoose = require('mongoose');
+const Message = require('./models/Message');
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// MongoDB bağlantısı
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('MongoDB bağlantısı başarılı'))
+    .catch(err => console.error('MongoDB bağlantı hatası:', err));
 
 app.use(cors());
 
@@ -26,6 +35,18 @@ app.get('/generate-key', (req, res) => {
     const uniqueKey = generateUniqueKey();
     console.log('Oluşturulan key:', uniqueKey);
     res.json({ key: uniqueKey });
+});
+
+// Oda geçmişi endpoint'i
+app.get('/room-history/:roomKey', async (req, res) => {
+    try {
+        const messages = await Message.find({ 
+            roomKey: req.params.roomKey 
+        }).sort({ createdAt: -1 }).limit(100);
+        res.json(messages);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // const server = app.listen(PORT, () => {
@@ -68,19 +89,33 @@ wss.on('connection', (ws, req) => {
     // Katılma mesajını gönder
     broadcastSystemMessage(roomKey, `${username} odaya katıldı`);
 
-    ws.on('message', (data) => {
-        const messageData = JSON.parse(data);
-        
-        rooms.get(roomKey).forEach((username, client) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({
-                    type: 'message',
-                    username: messageData.username,
-                    message: messageData.message
-                }));
-            }
-        });
+    // WebSocket message handler içine eklenecek kısım
+ws.on('message', async (data) => {
+    const messageData = JSON.parse(data);
+    
+    // Mesaj kaydetme tercihi kontrolü
+    if (messageData.saveMessage) {
+        try {
+            await Message.create({
+                username: messageData.username,
+                message: messageData.message,
+                roomKey: roomKey
+            });
+        } catch (err) {
+            console.error('Mesaj kaydetme hatası:', err);
+        }
+    }
+    
+    rooms.get(roomKey).forEach((username, client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+                type: 'message',
+                username: messageData.username,
+                message: messageData.message
+            }));
+        }
     });
+});
 
     ws.on('close', () => {
         const username = ws.username; // WebSocket nesnesinden username'i al

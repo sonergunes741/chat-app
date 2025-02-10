@@ -4,6 +4,8 @@ let username = '';
 let roomKey = '';
 let userAvatar = null;
 
+let saveMessages = false;
+
 // client.js başına ekleyin
 const clipboardSupported = navigator.clipboard && typeof navigator.clipboard.readText === 'function';
 if (!clipboardSupported) {
@@ -17,6 +19,13 @@ if (!clipboardSupported) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM yüklendi, event listener\'lar ekleniyor...');
     
+    const saveMessagesToggle = document.getElementById('saveMessagesToggle');
+    if (saveMessagesToggle) {
+        saveMessagesToggle.addEventListener('change', (e) => {
+            saveMessages = e.target.checked;
+        });
+    }
+
     // Tema kontrolü
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
@@ -114,6 +123,18 @@ function joinRoom() {
         if (userAvatar) {
             document.getElementById('userAvatar').style.backgroundImage = `url(${userAvatar})`;
         }
+
+        fetch(`${window.location.origin}/room-history/${roomKey}`)
+            .then(res => res.json())
+            .then(messages => {
+                messages.reverse().forEach(msg => {
+                    displayMessage({
+                        username: msg.username,
+                        message: msg.message
+                    });
+                });
+            })
+            .catch(err => console.error('Geçmiş mesajları yükleme hatası:', err));
     };
 
     socket.onmessage = (event) => {
@@ -133,6 +154,7 @@ function joinRoom() {
     };
 }
 
+// sendMessage fonksiyonu güncellemesi
 function sendMessage() {
     const input = document.getElementById('messageInput');
     const message = input.value;
@@ -141,7 +163,8 @@ function sendMessage() {
         socket.send(JSON.stringify({
             username,
             message,
-            avatar: userAvatar
+            avatar: userAvatar,
+            saveMessage: saveMessages
         }));
         input.value = '';
     }
