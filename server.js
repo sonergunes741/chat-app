@@ -49,6 +49,35 @@ app.get('/room-history/:roomKey', async (req, res) => {
     }
 });
 
+// Oda silme endpoint'i
+app.delete('/delete-room/:roomKey', async (req, res) => {
+    try {
+        const roomKey = req.params.roomKey;
+        
+        // Odadaki mesajları sil
+        await Message.deleteMany({ roomKey: roomKey });
+        
+        // Odayı WebSocket rooms map'inden sil
+        if (rooms.has(roomKey)) {
+            // Odadaki tüm kullanıcılara bildirim gönder
+            broadcastSystemMessage(roomKey, 'Bu oda silindi. Lütfen sayfayı yenileyin.');
+            
+            // Odadaki tüm bağlantıları kapat
+            rooms.get(roomKey).forEach((username, ws) => {
+                ws.close();
+            });
+            
+            // Odayı sil
+            rooms.delete(roomKey);
+        }
+        
+        res.json({ success: true, message: 'Oda başarıyla silindi.' });
+    } catch (err) {
+        console.error('Oda silme hatası:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // const server = app.listen(PORT, () => {
 //     console.log(`Server http://localhost:${PORT} adresinde çalışıyor`);
 // });

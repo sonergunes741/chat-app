@@ -429,3 +429,55 @@ input:checked + .toggle-slider {
 input:checked + .toggle-slider:before {
     transform: translateX(26px);
 }
+
+.delete-room-btn {
+    margin-top: 20px;
+    padding: 12px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.3s;
+}
+
+.delete-room-btn:hover {
+    opacity: 0.9;
+}
+
+.delete-room-confirm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--panel-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px var(--shadow);
+    z-index: 1000;
+}
+
+.delete-room-confirm-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.delete-room-confirm-buttons button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.delete-room-confirm-yes {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-room-confirm-no {
+    background: var(--text-secondary);
+    color: white;
+}

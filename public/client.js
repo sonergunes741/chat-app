@@ -275,6 +275,45 @@ async function pasteKey() {
     }
 }
 
+async function deleteRoom() {
+    const confirmDialog = document.createElement('div');
+    confirmDialog.className = 'delete-room-confirm';
+    confirmDialog.innerHTML = `
+        <h3>Odayı Sil</h3>
+        <p>Bu odayı ve tüm mesajları silmek istediğinizden emin misiniz?</p>
+        <div class="delete-room-confirm-buttons">
+            <button class="delete-room-confirm-yes">Evet, Sil</button>
+            <button class="delete-room-confirm-no">İptal</button>
+        </div>
+    `;
+    
+    document.body.appendChild(confirmDialog);
+    
+    confirmDialog.querySelector('.delete-room-confirm-yes').addEventListener('click', async () => {
+        try {
+            const response = await fetch(`${window.location.origin}/delete-room/${roomKey}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Oda silinirken bir hata oluştu');
+            }
+            
+            // Sayfayı yenile
+            window.location.reload();
+        } catch (err) {
+            console.error('Oda silme hatası:', err);
+            alert('Oda silinirken bir hata oluştu: ' + err.message);
+        }
+        confirmDialog.remove();
+    });
+    
+    confirmDialog.querySelector('.delete-room-confirm-no').addEventListener('click', () => {
+        confirmDialog.remove();
+    });
+}
+
+
 // client.js'de bağlantı hatası kontrolü ekleyin
 socket.onerror = (error) => {
     console.error('WebSocket Error:', error);
